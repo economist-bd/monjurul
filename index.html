@@ -76,49 +76,53 @@
         </div>
     </div>
     <script type="module">
-        // Import the functions you need from the SDKs you need
+        // Firebase imports (modular SDK)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
+        import { getDatabase, ref, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        // Your web app's Firebase configuration
+        // Your Firebase config
         const firebaseConfig = {
-          apiKey: "AIzaSyCbZD1X2iXESuwvbFif3m9PZ7xK-bsZ1uc",
-          authDomain: "kobitar-khata-oe1bo.firebaseapp.com",
-          projectId: "kobitar-khata-oe1bo",
-          storageBucket: "kobitar-khata-oe1bo.firebasestorage.app",
-          messagingSenderId: "901122182466",
-          appId: "1:901122182466:web:3626237efc0dfff3948cdb"
+            apiKey: "AIzaSyCbZD1X2iXESuwvbFif3m9PZ7xK-bsZ1uc",
+            authDomain: "kobitar-khata-oe1bo.firebaseapp.com",
+            projectId: "kobitar-khata-oe1bo",
+            storageBucket: "kobitar-khata-oe1bo.firebasestorage.app",
+            messagingSenderId: "901122182466",
+            appId: "1:901122182466:web:3626237efc0dfff3948cdb",
+            databaseURL: "https://kobitar-khata-oe1bo-default-rtdb.firebaseio.com"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // Your original poem posting logic (local, not yet using Firebase Database)
+        // DOM elements
         const form = document.getElementById('poemForm');
         const poemsContainer = document.getElementById('poemsContainer');
         const noPoemMsg = document.getElementById('noPoemMsg');
-        let poems = [];
 
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
             const author = document.getElementById('author').value.trim();
             const title = document.getElementById('title').value.trim();
             const text = document.getElementById('text').value.trim();
             if (author && title && text) {
-                poems.unshift({author, title, text});
-                renderPoems();
+                // Save poem to Firebase
+                await push(ref(db, 'poems'), {
+                    author, title, text,
+                    timestamp: Date.now()
+                });
                 form.reset();
             }
         });
 
-        function renderPoems() {
+        // Listen for poems from Firebase, update list in real time
+        function renderPoems(poems) {
             poemsContainer.innerHTML = '';
             if (poems.length === 0) {
                 poemsContainer.appendChild(noPoemMsg);
                 return;
             }
-            poems.forEach(poem => {
+            poems.reverse().forEach(poem => {
                 const poemDiv = document.createElement('div');
                 poemDiv.className = 'poem';
                 poemDiv.innerHTML = `
@@ -130,8 +134,18 @@
             });
         }
 
-        // Initial render
-        renderPoems();
+        // Realtime fetch (limit to latest 20 poems for performance)
+        const poemsQuery = query(ref(db, 'poems'), limitToLast(20));
+        onValue(poemsQuery, (snapshot) => {
+            const poemsArr = [];
+            snapshot.forEach(child => {
+                poemsArr.push(child.val());
+            });
+            // Sort by time descending
+            poemsArr.sort((a, b) => b.timestamp - a.timestamp);
+            renderPoems(poemsArr);
+        });
+
     </script>
 </body>
 </html>
