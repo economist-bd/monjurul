@@ -75,7 +75,26 @@
             <div id="noPoemMsg">এখনো কোনো কবিতা পোস্ট হয়নি।</div>
         </div>
     </div>
-    <script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyCbZD1X2iXESuwvbFif3m9PZ7xK-bsZ1uc",
+          authDomain: "kobitar-khata-oe1bo.firebaseapp.com",
+          projectId: "kobitar-khata-oe1bo",
+          storageBucket: "kobitar-khata-oe1bo.firebasestorage.app",
+          messagingSenderId: "901122182466",
+          appId: "1:901122182466:web:3626237efc0dfff3948cdb"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // Your original poem posting logic (local, not yet using Firebase Database)
         const form = document.getElementById('poemForm');
         const poemsContainer = document.getElementById('poemsContainer');
         const noPoemMsg = document.getElementById('noPoemMsg');
