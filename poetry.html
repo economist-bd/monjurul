@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>কবিতার পাতা</title>
+    <style>
+        body { 
+            font-family: 'SolaimanLipi', Arial, sans-serif; 
+            background: #f8f9fa; 
+            margin: 0; 
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 30px 20px 20px 20px;
+            border-radius: 8px;
+        }
+        h1, h2 {
+            color: #2d3436;
+        }
+        .poem-form input, .poem-form textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #b2bec3;
+            font-size: 1em;
+        }
+        .poem-form button {
+            background: #00b894;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .poem {
+            background: #f1f2f6;
+            margin: 16px 0;
+            padding: 12px 16px;
+            border-radius: 6px;
+        }
+        .poem-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .poem-text {
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+        .poem-author {
+            color: #636e72;
+            font-style: italic;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>কবিতার পাতা</h1>
+        <h2>নতুন কবিতা পোস্ট করুন</h2>
+        <form class="poem-form" id="poemForm">
+            <input type="text" id="author" placeholder="আপনার নাম" required>
+            <input type="text" id="title" placeholder="কবিতার শিরোনাম" required>
+            <textarea id="text" rows="5" placeholder="আপনার কবিতা" required></textarea>
+            <button type="submit">পোস্ট করুন</button>
+        </form>
+        <h2>সাম্প্রতিক কবিতাসমূহ</h2>
+        <div id="poemsContainer">
+            <div id="noPoemMsg">এখনো কোনো কবিতা পোস্ট হয়নি।</div>
+        </div>
+    </div>
+    <script>
+        const form = document.getElementById('poemForm');
+        const poemsContainer = document.getElementById('poemsContainer');
+        const noPoemMsg = document.getElementById('noPoemMsg');
+        let poems = [];
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const author = document.getElementById('author').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const text = document.getElementById('text').value.trim();
+            if (author && title && text) {
+                poems.unshift({author, title, text});
+                renderPoems();
+                form.reset();
+            }
+        });
+
+        function renderPoems() {
+            poemsContainer.innerHTML = '';
+            if (poems.length === 0) {
+                poemsContainer.appendChild(noPoemMsg);
+                return;
+            }
+            poems.forEach(poem => {
+                const poemDiv = document.createElement('div');
+                poemDiv.className = 'poem';
+                poemDiv.innerHTML = `
+                    <div class="poem-title">${poem.title}</div>
+                    <div class="poem-text">${poem.text.replace(/\n/g, '<br>')}</div>
+                    <div class="poem-author">লিখেছেন: ${poem.author}</div>
+                `;
+                poemsContainer.appendChild(poemDiv);
+            });
+        }
+
+        // Initial render
+        renderPoems();
+    </script>
+</body>
+</html>
